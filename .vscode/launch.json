@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "configurations": [
+    {
+        "type": "node",
+        "request": "launch",
+        "name": "Launch Stack",
+        "cwd": "${workspaceRoot}",
+        "runtimeExecutable": "npm",
+        "runtimeArgs": [
+            "run-script", "start",
+        ],
+        "postDebugTask": "post-stop",
+        "serverReadyAction":{
+            "pattern": "Server is running on port ([0-9]+)",
+            "uriFormat": "http://localhost:%s",
+            "action": "openExternally",
+            "killOnServerStop": false
+        }
+    }
+  ]
+}
