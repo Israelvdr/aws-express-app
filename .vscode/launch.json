@@ -5,14 +5,15 @@
         "type": "node",
         "request": "launch",
         "name": "Launch Stack",
-        "cwd": "${workspaceRoot}",
+        "cwd": "${workspaceRoot}/node-express",
         "runtimeExecutable": "npm",
         "runtimeArgs": [
             "run-script", "start",
         ],
-        "postDebugTask": "post-stop",
+        "preLaunchTask": "start-db",
+        "postDebugTask": "stop-db",
         "serverReadyAction":{
-            "pattern": "Server is running on port ([0-9]+)",
+            "pattern": "Listening on port ([0-9]+)",
             "uriFormat": "http://localhost:%s",
             "action": "openExternally",
             "killOnServerStop": false

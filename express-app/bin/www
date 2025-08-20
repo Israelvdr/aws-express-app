@@ -1,0 +1,133 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+require('dotenv').config();
+var psql_db = require('../psql-db/psql-db')
+var app_builder = require('../app');
+var debug = require('debug')('node-express:server');
+var http = require('http');
+
+
+/**
+ * Get db connection string from environment and use to build app.
+ */
+
+var db_url = process.env.POSTGRES_URL;
+db = new psql_db(db_url);
+db.connect();
+var app = app_builder(db)
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var env = process.env.ENVIRONMENT || 'development';
+app.set('env', env);
+if (env==='development') {
+
+}
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  console.log('Listening on ' + bind);
+}
+
+function terminate(signal) {
+  console.log(`${signal} signal received: closing HTTP server.`)
+  try {
+    console.log("Shutting down gracefully...")
+    console.log("Closing server ports.")
+    server.close(() => {
+      debug('HTTP server closed')
+      console.log("Closing db connection.");
+      db.disconnect();
+    })
+    process.exitCode = 0
+  } catch (err) {
+    console.log("Graceful shutdown failed.")
+    console.log(err);
+    process.exitCode = 1
+  }
+}
+
+process.on('SIGINT', terminate)
+process.on('SIGTERM', terminate)

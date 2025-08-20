@@ -2,9 +2,22 @@
   "version": "2.0.0",
   "tasks": [
     {
-        "label": "post-stop",
+        "label": "start-db",
         "type": "shell",
-        "command": "npm run-script poststop",
+        "command": "docker compose -f ${workspaceRoot}/psql-db/compose.yml up -d",
+        "presentation": {
+            "echo": true,
+            "reveal": "silent",
+            "focus": false,
+            "panel": "shared",
+            "showReuseMessage": false,
+            "clear": false
+        }
+    },
+    {
+        "label": "stop-db",
+        "type": "shell",
+        "command": "docker compose -f ${workspaceRoot}/psql-db/compose.yml down",
         "presentation": {
             "echo": true,
             "reveal": "silent",

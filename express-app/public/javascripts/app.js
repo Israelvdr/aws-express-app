@@ -63,7 +63,7 @@ const next_question = function() {
 const get_progress = function(){
 	m.request({
 		method: "GET",
-		url: base_url+"/progress",
+		url: base_url+"/answers/progress",
 	})
 	.then(function(data) {
     progress.answer_count = parseInt(data.answer_count)
@@ -100,7 +100,7 @@ const submit = async function(){
 const reset = async function(){
   await m.request({
       method: "POST",
-      url: base_url+"/reset"
+      url: base_url+"/answers/reset"
   })
   next();
 }
