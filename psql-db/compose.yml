@@ -1,0 +1,14 @@
+services:
+  psql-db:
+    build: .
+    restart: on-failure:3
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - db-certs:/var/lib/postgresql/certs
+    env_file: .env
+    ports:
+      - 5432:5432
+
+volumes:
+  db-data:
+  db-certs:
