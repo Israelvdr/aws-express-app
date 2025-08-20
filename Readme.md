@@ -1,5 +1,7 @@
 A basic express.js web app for the purposes of learning AWS.
 
+Based on [templates](https://github.com/ExamProCo/TheFreeAWSDeveloperAssociate/tree/master/study-sync-000) and content from Andrew Brown and his [AWS DVA-C02 course](https://www.exampro.co/dva-c02).
+
 
 Prerequisites:
 - Docker
