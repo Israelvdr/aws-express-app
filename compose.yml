@@ -1,0 +1,33 @@
+name: aws-express-app
+
+services:
+  psql-db:
+    image: psql-db-image
+    build:
+      context: psql-db
+    hostname: ${POSTGRES_URL}
+    container_name: express-app-db
+    restart: on-failure:3
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - db-certs:/var/lib/postgresql/certs
+    env_file: .env
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+
+  express-app:
+    image: express-app-image
+    build:
+      context: express-app
+    hostname: app
+    container_name: express-app
+    restart: on-failure:3
+    env_file: .env
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - psql-db
+
+volumes:
+  db-data:
+  db-certs:

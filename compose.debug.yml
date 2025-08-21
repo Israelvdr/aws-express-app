@@ -1,0 +1,21 @@
+name: aws-express-app
+
+services:
+  psql-db:
+    image: debug-db-image
+    hostname: debug-db
+    container_name: debug-app-db
+    restart: no
+
+  express-app:
+    image: debug-app-image
+    hostname: debug-app
+    container_name: debug-express-app
+    restart: no
+    command: npm run debug
+    ports:
+      - 9229:9229
+    environment:
+      - POSTGRES_URL=debug-db
+      - ENVIRONMENT=development
+      - DEBUG=true

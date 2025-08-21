@@ -1,0 +1,34 @@
+{
+  "containers.commands.composeUp": [
+    {
+        "label": "debug-match",
+        "template": "docker compose -f compose.yml -f compose.debug.yml up --build",
+        "match": "debug"
+    },
+    {
+        "label": "dev-match",
+        "template": "docker compose -f compose.yml -f compose.dev.yml up --build",
+        "match": "dev"
+    },
+    {
+        "label": "prod-match",
+        "template": "docker compose -f compose.yml -f compose.release.yml up --build",
+        "match": "prod"
+    },
+    {
+        "label": "default",
+        "template": "docker compose -f compose.yml up",
+    }
+  ],
+  "containers.commands.composeDown": [
+    {
+        "label": "clean-match",
+        "template": "${composeCommand} ${configurationFile} down --rmi -v",
+        "match": "clean"
+    },
+    {
+        "label": "default",
+        "template": "${composeCommand} ${configurationFile} down",
+    }
+  ]
+}

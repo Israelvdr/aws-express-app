@@ -3,3 +3,5 @@ node_modules
 .elasticbeanstalk/*
 !.elasticbeanstalk/*config.yml
 !.elasticbeanstalk/*.global.yml
+*.key
+*.crt

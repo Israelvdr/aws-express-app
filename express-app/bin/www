@@ -3,76 +3,49 @@
 /**
  * Module dependencies.
  */
-
-require('dotenv').config();
-var psql_db = require('../psql-db/psql-db')
-var app_builder = require('../app');
+var fs = require('fs');
+var express = require('express');
+var configure_app = require('../app');
 var debug = require('debug')('node-express:server');
-var http = require('http');
+var https = require('https');
+var configure_DI = require('./dependencies');
+var path = require('path');
 
 
 /**
- * Get db connection string from environment and use to build app.
+ * Configure dependenvy injection container.
  */
 
-var db_url = process.env.POSTGRES_URL;
-db = new psql_db(db_url);
-db.connect();
-var app = app_builder(db)
+var di_container = configure_DI();
+
 
 /**
- * Get port from environment and store in Express.
+ * Initialise and configure app.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+var app = express();
+configure_app(app, di_container)
+
 
 /**
- * Get port from environment and store in Express.
+ * Get HTTPS credentials and create server.
  */
 
-var env = process.env.ENVIRONMENT || 'development';
-app.set('env', env);
-if (env==='development') {
-
-}
-
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
+var privateKey  = fs.readFileSync('certificates/express-app.key', 'utf8');
+var certificate = fs.readFileSync('certificates/express-app.crt', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
+var server = https.createServer(credentials, app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+server.listen(di_container.port);
 server.on('error', onError);
 server.on('listening', onListening);
 
 /**
- * Normalize a port into a number, string, or false.
- */
-
-function normalizePort(val) {
-  var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
-}
-
-/**
- * Event listener for HTTP server "error" event.
+ * Event listener for HTTPS server "error" event.
  */
 
 function onError(error) {
@@ -100,7 +73,7 @@ function onError(error) {
 }
 
 /**
- * Event listener for HTTP server "listening" event.
+ * Event listener for HTTPS server "listening" event.
  */
 
 function onListening() {
@@ -108,26 +81,26 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  console.log('Listening on ' + bind);
-}
+  debug('Listening on ' + bind);
+};
 
 function terminate(signal) {
-  console.log(`${signal} signal received: closing HTTP server.`)
+  debug(`${signal} signal received: closing HTTPS server.`);
   try {
-    console.log("Shutting down gracefully...")
-    console.log("Closing server ports.")
+    console.log("Shutting down gracefully...");
+    debug("Closing server ports.");
     server.close(() => {
-      debug('HTTP server closed')
-      console.log("Closing db connection.");
+      debug('HTTPS server closed');
+      debug("Closing db connection.");
       db.disconnect();
-    })
-    process.exitCode = 0
+    });
+    process.exitCode = 0;
   } catch (err) {
-    console.log("Graceful shutdown failed.")
+    console.log("Graceful shutdown failed.");
     console.log(err);
-    process.exitCode = 1
+    process.exitCode = 1;
   }
 }
 
-process.on('SIGINT', terminate)
-process.on('SIGTERM', terminate)
+process.on('SIGINT', terminate);
+process.on('SIGTERM', terminate);

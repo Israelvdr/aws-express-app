@@ -2,22 +2,32 @@
   "version": "2.0.0",
   "configurations": [
     {
-        "type": "node",
-        "request": "launch",
-        "name": "Launch Stack",
-        "cwd": "${workspaceRoot}/node-express",
-        "runtimeExecutable": "npm",
-        "runtimeArgs": [
-            "run-script", "start",
-        ],
-        "preLaunchTask": "start-db",
-        "postDebugTask": "stop-db",
-        "serverReadyAction":{
-            "pattern": "Listening on port ([0-9]+)",
-            "uriFormat": "http://localhost:%s",
-            "action": "openExternally",
-            "killOnServerStop": false
-        }
+      "name": "Debug express-app bare: ephemeral db",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/express-app/bin/www",
+      "cwd": "${workspaceFolder}/express-app",
+      "runtimeExecutable": "node",
+      "preLaunchTask": "docker compose up db",
+      "postDebugTask": "docker compose down db",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "DEBUG": "true"
+      },
+      "outputCapture": "std",
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "Debugger attached."
+      }
+    },
+    {
+      "name": "Containers: Node.js Attach (Non-functional)",
+      "type": "node",
+      "request": "attach",
+      "port":9229,
+      "remoteRoot": "/app",
+      "trace": true,
+      "address": "localhost"
     }
   ]
 }

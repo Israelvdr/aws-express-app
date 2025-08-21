@@ -2,30 +2,116 @@
   "version": "2.0.0",
   "tasks": [
     {
-        "label": "start-db",
-        "type": "shell",
-        "command": "docker compose -f ${workspaceRoot}/psql-db/compose.yml up -d",
-        "presentation": {
-            "echo": true,
-            "reveal": "silent",
-            "focus": false,
-            "panel": "shared",
-            "showReuseMessage": false,
-            "clear": false
-        }
+      "type": "shell",
+      "label": "docker compose build: debug",
+      "command":"docker compose -f compose.yml -f compose.debug.yml build"
     },
     {
-        "label": "stop-db",
-        "type": "shell",
-        "command": "docker compose -f ${workspaceRoot}/psql-db/compose.yml down",
-        "presentation": {
-            "echo": true,
-            "reveal": "silent",
-            "focus": false,
-            "panel": "shared",
-            "showReuseMessage": false,
-            "clear": false
-        }
+      "type": "shell",
+      "label": "docker compose build",
+      "command":"docker compose -f compose.yml build"
+    },
+    {
+      "type": "shell",
+      "label": "docker compose build db",
+      "command":"docker compose -f compose.yml build psql-db"
+    },
+    {
+      "type": "shell",
+      "label": "docker compose create and build db",
+      "command":"docker compose -f compose.yml create --build psql-db",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "revealProblems":"onProblem",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "type": "shell",
+      "label": "docker compose up db",
+      "command":"docker compose start psql-db",
+      "dependsOn": [
+        "docker compose create and build db"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "revealProblems":"onProblem",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "type": "shell",
+      "label": "docker compose down db",
+      "command":"docker compose down --rmi local -v psql-db",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "revealProblems":"onProblem",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "type": "shell",
+      "label": "docker compose stop db",
+      "command":"docker compose stop psql-db",
+    },
+    {
+      "type":"docker-compose",
+      "label": "docker compose up",
+      "dockerCompose": {
+        "up": {
+          "detached": false
+        },
+        "files": [
+          "compose.yml"
+        ],
+      }
+    },
+    {
+      "type":"docker-compose",
+      "label": "docker compose up: debug",
+      "dockerCompose": {
+        "up": {
+          "detached": false,
+          "build": true
+        },
+        "files": [
+          "compose.yml",
+          "compose.debug.yml"
+        ]
+      }
+    },
+    {
+      "type":"docker-compose",
+      "label": "docker compose down",
+      "dockerCompose": {
+        "down": {}
+      }
+    },
+    {
+      "type":"docker-compose",
+      "label": "docker compose down: debug",
+      "dockerCompose": {
+        "down": {
+          "removeImages": "local",
+          "removeVolumes": true
+        },
+        "files": [
+          "compose.yml",
+          "compose.debug.yml"
+        ]
+      }
     }
   ]
 }
