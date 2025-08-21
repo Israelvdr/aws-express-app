@@ -1,0 +1,47 @@
+name: aws-express-app
+
+services:
+  psql-db:
+    build:
+      context: psql-db
+    hostname: db.express-app.com
+    container_name: express-app-db
+    restart: on-failure:3
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - db-certs:/var/lib/postgresql/certs
+    env_file: .env
+    ports:
+      - "5432:5432"
+
+  proxy:
+    build:
+      context: proxy
+    container_name: express-app-proxy
+    hostname: proxy.express-app.com
+    volumes:
+      - "/var/log/nginx:/var/log/nginx"
+    environment:
+      - EXPRESS_PORT=5000
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - express-app
+
+  express-app:
+    build:
+      context: express-app
+    hostname: app.express-app.com
+    container_name: express-app
+    restart: on-failure:3
+    env_file: .env
+    ports:
+      - "5000:5000"
+      - POSTGRES_URL=db.express-app.com
+    depends_on:
+      - psql-db
+
+volumes:
+  db-data:
+  db-certs:
