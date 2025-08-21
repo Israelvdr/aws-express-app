@@ -1,12 +1,12 @@
 branch-defaults:
   main:
-    environment: aws-express-env
+    environment: null
     group_suffix: null
 global:
   application_name: aws-express-app
   branch: null
   default_ec2_keyname: aws-eb
-  default_platform: Node.js 22 running on 64bit Amazon Linux 2023
+  default_platform: Docker
   default_region: ap-southeast-2
   include_git_submodules: true
   instance_profile: null

@@ -18,8 +18,9 @@ RUN npm install
 # Set appropriate cert permissions
 # TODO: setup non-root user for server
 RUN chmod 755 certificates
-RUN chmod 640 certificates/express-app.key
-RUN chmod 640 certificates/express-app.crt
+ENV KEY_NAME=app.express-app.com
+RUN chmod 640 certificates/$KEY_NAME.key
+RUN chmod 640 certificates/$KEY_NAME.crt
 
 
 CMD ["npm", "start"]

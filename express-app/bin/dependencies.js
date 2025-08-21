@@ -30,7 +30,7 @@ module.exports = function configure_DI() {
   di_container.add("questions_router", () => {
     return build_questions_router(di_container.db_client);
   });
-  di_container.add("port", () => { return normalizePort(process.env.PORT || '3000') });
+  di_container.add("port", () => { return normalizePort(process.env.EXPRESS_PORT || '5000') });
   di_container.add("env", () => { return process.env.ENVIRONMENT || 'development' });
 
   return di_container;

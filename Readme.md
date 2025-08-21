@@ -2,6 +2,8 @@ A basic express.js web app for the purposes of learning AWS.
 
 Based on [templates](https://github.com/ExamProCo/TheFreeAWSDeveloperAssociate/tree/master/study-sync-000) and content from Andrew Brown and his [AWS DVA-C02 course](https://www.exampro.co/dva-c02).
 
+Update: v2.2 has added an NGINX reverse proxy.
+
 Update: v2.1 has introduced a major overhaul to the full express framework and project structure.
 
 Several security features have implemented to harden the application (although more are still required).

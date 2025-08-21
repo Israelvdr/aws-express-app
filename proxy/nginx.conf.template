@@ -1,0 +1,11 @@
+map $host $CERT_PATH {
+  default "$CERT_PATH";
+}
+
+map $host $KEY_NAME {
+  default "$KEY_NAME";
+}
+
+map $host $EXPRESS_PORT {
+  default "$EXPRESS_PORT";
+}

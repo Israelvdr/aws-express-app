@@ -2,7 +2,6 @@ name: aws-express-app
 
 services:
   psql-db:
-    image: psql-db-image
     build:
       context: psql-db
     hostname: ${POSTGRES_URL}
@@ -15,16 +14,30 @@ services:
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
 
+  proxy:
+    build:
+      context: proxy
+    container_name: express-app-proxy
+    hostname: proxy.express-app.com
+    volumes:
+      - "/var/log/nginx:/var/log/nginx"
+    environment:
+      - EXPRESS_PORT=${EXPRESS_PORT}
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - express-app
+
   express-app:
-    image: express-app-image
     build:
       context: express-app
-    hostname: app
+    hostname: app.express-app.com
     container_name: express-app
     restart: on-failure:3
     env_file: .env
     ports:
-      - "${PORT}:${PORT}"
+      - "${EXPRESS_PORT}:${EXPRESS_PORT}"
     depends_on:
       - psql-db
 

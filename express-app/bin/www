@@ -31,8 +31,9 @@ configure_app(app, di_container)
  * Get HTTPS credentials and create server.
  */
 
-var privateKey  = fs.readFileSync('certificates/express-app.key', 'utf8');
-var certificate = fs.readFileSync('certificates/express-app.crt', 'utf8');
+var key_name = process.env.KEY_NAME || 'app.express-app.com';
+var privateKey  = fs.readFileSync(`certificates/${key_name}.key`, 'utf8');
+var certificate = fs.readFileSync(`certificates/${key_name}.crt`, 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 var server = https.createServer(credentials, app);
 

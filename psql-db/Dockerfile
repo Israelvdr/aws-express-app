@@ -4,7 +4,7 @@ FROM postgres:17.6-alpine3.22
 ENV CERT_DIR=/var/lib/postgresql/certificates
 RUN mkdir $CERT_DIR
 
-ENV CERT_NAME=psql-db
+ENV CERT_NAME=db.express-app.com
 COPY certificates/$CERT_NAME.crt $CERT_DIR/$CERT_NAME.crt
 COPY certificates/$CERT_NAME.key $CERT_DIR/$CERT_NAME.key
 
@@ -26,5 +26,5 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Set config
 CMD ["-c","ssl=on",\
-    "-c","ssl_cert_file=/var/lib/postgresql/certificates/psql-db.crt",\
-    "-c","ssl_key_file=/var/lib/postgresql/certificates/psql-db.key"]
+    "-c","ssl_cert_file=/var/lib/postgresql/certificates/db.express-app.com.crt",\
+    "-c","ssl_key_file=/var/lib/postgresql/certificates/db.express-app.com.key"]
