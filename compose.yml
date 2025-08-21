@@ -4,13 +4,13 @@ services:
   psql-db:
     build:
       context: psql-db
-    hostname: ${POSTGRES_URL}
+    hostname: db.express-app.com
     container_name: express-app-db
     restart: on-failure:3
     volumes:
       - db-data:/var/lib/postgresql/data
       - db-certs:/var/lib/postgresql/certs
-    env_file: .env
+    env_file: example.env
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
 
@@ -35,9 +35,10 @@ services:
     hostname: app.express-app.com
     container_name: express-app
     restart: on-failure:3
-    env_file: .env
+    env_file: example.env
     ports:
       - "${EXPRESS_PORT}:${EXPRESS_PORT}"
+      - POSTGRES_URL=db.express-app.com
     depends_on:
       - psql-db
 

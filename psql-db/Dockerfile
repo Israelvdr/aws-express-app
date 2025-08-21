@@ -2,17 +2,17 @@ FROM postgres:17.6-alpine3.22
 
 # Add certs and cert directory
 ENV CERT_DIR=/var/lib/postgresql/certificates
-RUN mkdir $CERT_DIR
+RUN mkdir -p $CERT_DIR
 
 ENV CERT_NAME=db.express-app.com
-COPY certificates/$CERT_NAME.crt $CERT_DIR/$CERT_NAME.crt
-COPY certificates/$CERT_NAME.key $CERT_DIR/$CERT_NAME.key
+# COPY certificates/$CERT_NAME.crt $CERT_DIR/$CERT_NAME.crt
+# COPY certificates/$CERT_NAME.key $CERT_DIR/$CERT_NAME.key
 
 # Install openssl, generate certs, and remove openssl again
-# RUN apk -U add openssl
-# RUN openssl req -new -x509 -days 365 -nodes -text -out /var/lib/postgresql/certs/psql-db.crt \
-#   -keyout /var/lib/postgresql/certs/psql-db.key -subj "/CN=psql-db"
-# RUN apk del openssl
+RUN apk -U add openssl
+RUN openssl req -new -x509 -days 365 -nodes -text -out $CERT_DIR/$CERT_NAME.crt \
+  -keyout $CERT_DIR/$CERT_NAME.key -subj "/CN=psql-db"
+RUN apk del openssl
 
 # Set appropriate cert permissions
 RUN chown 70:70 $CERT_DIR && chmod 755 $CERT_DIR

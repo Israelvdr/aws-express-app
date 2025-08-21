@@ -5,22 +5,25 @@ WORKDIR /app
 COPY . .
 RUN npm install
 
+ENV CERT_PATH=/app/certificates
+ENV CERT_NAME=app.express-app.com
+
 # Setup certs
 # Add cert directory
-# RUN mkdir certificates
+RUN mkdir $CERT_PATH
 
 # Install openssl, generate certs, and remove openssl again
-# RUN apk -U add openssl
-# RUN openssl req -new -x509 -days 365 -nodes -text -out certs/express-app.crt \
-#   -keyout certs/express-app.key -subj "/CN=express-app"
-# RUN apk del openssl
+# Install openssl, generate certs, and remove openssl again
+RUN apk -U add openssl
+RUN openssl req -new -x509 -days 365 -nodes -text -out $CERT_PATH/$CERT_NAME.crt \
+  -keyout $CERT_PATH/$CERT_NAME.key -subj "/CN=psql-db"
+RUN apk del openssl
 
 # Set appropriate cert permissions
 # TODO: setup non-root user for server
-RUN chmod 755 certificates
-ENV KEY_NAME=app.express-app.com
-RUN chmod 640 certificates/$KEY_NAME.key
-RUN chmod 640 certificates/$KEY_NAME.crt
+RUN chmod 755 $CERT_PATH
+RUN chmod 640 $CERT_PATH/$CERT_NAME.key
+RUN chmod 640 $CERT_PATH/$CERT_NAME.crt
 
 
 CMD ["npm", "start"]
