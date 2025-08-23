@@ -1,6 +1,6 @@
 branch-defaults:
   main:
-    environment: aws-express-app
+    environment: null
     group_suffix: null
 global:
   application_name: aws-express-app

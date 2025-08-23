@@ -1,62 +1,101 @@
 name: aws-express-app
 
+# Shared environment variables
+# Set sensible defaults.
+x-env: &env
+  - "POSTGRES_USER=${POSTGRES_USER:-db-user}"
+  - "POSTGRES_DB=${POSTGRES_DB:-db-name}"
+  - "POSTGRES_URL=${POSTGRES_URL:-db.express-app.com}"
+  - "POSTGRES_PORT=${POSTGRES_PORT:-5432}"
+  - "APP_DB_RETRY_DELAY=${POSTGRES_RETRY_DELAY:-2000}"
+  - "APP_DB_MAX_RETRIES=${POSTGRES_MAX_RETRIES:-10}"
+  - "EXPRESS_PORT=${EXPRESS_PORT:-5000}"
+  - "ENVIRONMENT=${ENVIRONMENT:-development}"
+
 services:
-  psql-db:
+  db:
     build:
       context: psql-db
-    hostname: db.express-app.com
     container_name: express-app-db
-    restart: on-failure:3
-    volumes:
-      - db-data:/var/lib/postgresql/data
-      - db-certs:/var/lib/postgresql/certs
     env_file: .env
     environment:
-      - POSTGRES_PASSWORD=db-password
-      - POSTGRES_USER=db-user
-      - POSTGRES_DB=db-name
-      - POSTGRES_URL=db.express-app.com
-      - POSTGRES_PORT=5432
-    ports:
-      - "5432:5432"
+      - "POSTGRES_URL=${POSTGRES_URL:-db.express-app.com}"
+      - "ENVIRONMENT=${ENVIRONMENT:-development}"
+    hostname: db.express-app.com
+    labels:
+      - "com.express-app.service=db"
+      - "com.express-app.environment=${ENVIRONMENT:-development}"
+    restart: on-failure:3
+    secrets:
+      - source: x509.crt.db
+        uid:    0
+        gid:    70 # PostgreSQL user group
+      - source: x509.key.db
+        uid:    0
+        gid:    70 # PostgreSQL user group
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: express-app
+    container_name: express-app
+    depends_on:
+      - psql-db
+    env_file: .env
+    hostname: app.express-app.com
+    labels:
+      - "com.express-app.service=app"
+      - "com.express-app.environment=${ENVIRONMENT:-development}"
+    restart: on-failure:3
+    secrets:
+      - source: x509.crt.app
+        uid:    0
+      - source: x509.key.app
+        uid:    0
+      - source: x509.crt.db # To authenticate the DB
+        uid:    0
 
   proxy:
     build:
       context: proxy
     container_name: express-app-proxy
-    hostname: proxy.express-app.com
-    volumes:
-      - "/var/log/nginx:/var/log/nginx"
-    environment:
-      - EXPRESS_PORT=5000
-    ports:
-      - "80:80"
-      - "443:443"
     depends_on:
       - express-app
-
-  express-app:
-    build:
-      context: express-app
-    hostname: app.express-app.com
-    container_name: express-app
-    restart: on-failure:3
     env_file: .env
-    environment:
-      - POSTGRES_PASSWORD=db-password
-      - POSTGRES_USER=db-user
-      - POSTGRES_DB=db-name
-      - POSTGRES_URL=db.express-app.com
-      - POSTGRES_PORT=5432
-      - POSTGRES_RETRY_DELAY=2000
-      - POSTGRES_MAX_RETRIES=10
-      - EXPRESS_PORT=5000
-      - ENVIRONMENT=development
-    ports:
-      - "5000:5000"
-    depends_on:
-      - psql-db
+    expose:
+      - "80"
+      - "443"
+    hostname: proxy.express-app.com
+    labels:
+      - "com.express-app.service=proxy"
+      - "com.express-app.environment=${ENVIRONMENT:-development}"
+    restart: on-failure:3
+    secrets:
+      - source: x509.crt.proxy
+        uid:    0
+      - source: x509.key.proxy
+        uid:    0
+      - source: x509.crt.app # To authenticate the app
+        uid:    0
+    volumes:
+      - "/var/log/nginx:/var/log/nginx"
+
+secrets:
+  x509.crt.db:
+    file: ./certificates/${DB_X509_CERT_FILE}
+  x509.key.db:
+    file: ./certificates/${DB_X509_KEY_FILE}
+    
+  x509.crt.app:
+    file: ./certificates/${APP_X509_CERT_FILE}
+  x509.key.app:
+    file: ./certificates/${APP_X509_KEY_FILE}
+    
+  x509.crt.proxy:
+    file: ./certificates/${PROXY_X509_CERT_FILE}
+  x509.key.proxy:
+    file: ./certificates/${PROXY_X509_KEY_FILE}
 
 volumes:
   db-data:
-  db-certs:

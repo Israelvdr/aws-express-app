@@ -1,21 +1,20 @@
-name: aws-express-app
+include: docker-compose.yml
 
 services:
-  psql-db:
+  db:
     image: debug-db-image
-    hostname: debug-db
+    hostname: debug.db.express-app.com
     container_name: debug-app-db
     restart: no
+    expose:
+      - "$POSTGRES_PORT"
 
-  express-app:
+  app:
     image: debug-app-image
     hostname: debug-app
-    container_name: debug-express-app
+    container_name: debug.app.express-app.com
     restart: no
     command: npm run debug
-    ports:
-      - 9229:9229
-    environment:
-      - POSTGRES_URL=debug-db
-      - ENVIRONMENT=development
-      - DEBUG=true
+    expose:
+      - 9229
+      - "$EXPRESS_PORT"

@@ -10,7 +10,7 @@ ENV CERT_NAME=app.express-app.com
 
 # Setup certs
 # Add cert directory
-RUN mkdir $CERT_PATH
+RUN mkdir -p $CERT_PATH
 
 # Install openssl, generate certs, and remove openssl again
 # Install openssl, generate certs, and remove openssl again

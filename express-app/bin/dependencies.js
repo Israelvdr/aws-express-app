@@ -7,13 +7,13 @@ var build_questions_router = require('../routes/questions');
 module.exports = function configure_DI() {
   var di_container = new rsdi.DIContainer()
   di_container.add("db_client", () => {
-    var db_url = process.env.POSTGRES_URL;
+    var db_url = process.env.POSTGRES_URL || "localhost";
     var db_port = process.env.POSTGRES_PORT || 5432; // Default to 5432 if not set
-    var db_name = process.env.POSTGRES_DB;
-    var db_user = process.env.POSTGRES_USER;
-    var db_password = process.env.POSTGRES_PASSWORD;
-    var retry_delay = process.env.POSTGRES_RETRY_DELAY || 5000; // Default to 5 seconds
-    var max_retries = process.env.POSTGRES_MAX_RETRIES || 5; // Default
+    var db_name = process.env.POSTGRES_DB || "postgres";
+    var db_user = process.env.POSTGRES_USER || "user";
+    var db_password = process.env.POSTGRES_PASSWORD; //! TODO: use secrets
+    var retry_delay = process.env.APP_DB_RETRY_DELAY || 5000; // Default to 5 seconds
+    var max_retries = process.env.APP_DB_MAX_RETRIES || 5; // Default
     return new psql_db({
       db_url,
       db_port,
